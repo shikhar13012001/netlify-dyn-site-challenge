@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@adobe/react-spectrum": "^3.35.0",
     "@hookform/resolvers": "^3.3.4",
     "@netlify/blobs": "^7.3.0",
     "@radix-ui/react-label": "^2.0.2",
@@ -19,11 +20,13 @@
     "fast-csv": "^5.0.1",
     "lucide-react": "^0.378.0",
     "next": "14.2.3",
+    "next-themes": "^0.3.0",
     "puppeteer": "^22.8.0",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.4",
     "react-icons": "^5.2.1",
+    "sonner": "^1.4.41",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^9.0.1",

@@ -6,6 +6,7 @@ import { FaFileCsv } from "react-icons/fa";
 import React, { ChangeEvent, FC, useRef } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { ImUpload } from "react-icons/im";
+import LoadingBar from "@/components/loading-bar";
 import {
   useFormField,
   Form,
@@ -95,9 +96,15 @@ const DropzoneComponent: React.ForwardRefRenderFunction<any, DropzoneProps> = (
 const Dropzone = React.forwardRef(DropzoneComponent);
 interface BulkUploadProps {
   handleFormSubmit: (data: { file: File | null }) => void;
+  isLoading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const BulkUpload: FC<BulkUploadProps> = ({ handleFormSubmit }) => {
+const BulkUpload: FC<BulkUploadProps> = ({
+  handleFormSubmit,
+  isLoading,
+  setLoading,
+}) => {
   const defaultValues: { file: null | File } = {
     file: null,
   };
@@ -166,14 +173,24 @@ const BulkUpload: FC<BulkUploadProps> = ({ handleFormSubmit }) => {
           )}
         />
         {methods.watch("file") && (
-          <div className="flex items-center justify-center gap-3 p-4 relative">
-            <FaFileCsv className="h-4 w-4" />
-            <p className="text-sm font-medium">{methods.watch("file")?.name}</p>
+          <div className="flex flex-col w-full items-center justify-center gap-3 p-4 relative">
+            {isLoading && <LoadingBar />}
+            <div className="flex items-center justify-center gap-2 p-2 ">
+              <FaFileCsv className="h-8 w-8" />
+              <p className="text-sm font-medium">
+                {methods.watch("file")?.name}
+              </p>
+            </div>
           </div>
         )}
         {methods.watch("file") && (
-          <Button type="submit" variant="outline" className="border-indigo-500 hover:bg-indigo-500 w-full text-white font-light mt-4">
-            Upload file
+          <Button
+            type="submit"
+            disabled={isLoading}
+            variant="outline"
+            className="border-indigo-500 hover:bg-indigo-500 w-full text-white font-light mt-4"
+          >
+            Capture Screenshots
           </Button>
         )}
       </form>
