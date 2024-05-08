@@ -1,4 +1,29 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-  
+@tailwind components;
+@tailwind utilities;
+
+ 
+
+.input-border {
+  /* Gradient border of purple, blue, and green */
+  border: 2px solid; /* Necessary to define border for border-image to work */ 
+  /* Border radius for curved corners */
+  border-radius: 10px;
+  /* Adding a glowing effect */ 
+  /* Padding and background color */
+  padding: 20px;
+  background-color: #090909;
+}
+
+.grayColor {
+  color: #747083 !important;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}

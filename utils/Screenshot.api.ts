@@ -21,19 +21,30 @@ class WebshotApi {
     return res; // this is blob data
   }
 
-  async processCSV(csv: string) {
-    // take the csv data and get the screenshot for each url
-    const urls = csv.split("\n");
-    const keys: string[] = [];
-    // run in parallel
-    await Promise.all(
-      urls.map(async (url) => {
-        const key = await this.takeScreenshot(url);
-        keys.push(key);
-      })
-    );
-    return keys;
-  }
+  async processCSV(csvFile: { file: File }) {
+    const file = csvFile.file;
+
+    // Create a Promise that resolves when the file is read
+    const readFilePromise = new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+        reader.readAsText(file);
+    });
+
+    try {
+        const fileContent = await readFilePromise;
+        const urls = fileContent.split("\n");
+
+        // Process all URLs concurrently using Promise.all
+        const keys = await Promise.all(urls.map(url => this.takeScreenshot(url)));
+
+        return keys;
+    } catch (error) {
+        console.error("Error processing CSV:", error);
+        throw error;  // Rethrow or handle as needed
+    }
+}
 
   async downloadScreenshot(key: string) {
     // download the screenshot from the given key
