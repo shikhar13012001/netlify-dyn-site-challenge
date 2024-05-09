@@ -1,10 +1,14 @@
 import { store } from "@/lib/netlify.blob";
-import exp from "constants";
 
 class WebshotApi {
   async takeScreenshot(
     url: string,
-    OPTIONS?: { width?: number; height?: number; fullPage?: boolean }
+    OPTIONS?: {
+      width?: number;
+      height?: number;
+      fullPage?: boolean;
+      bucket?: string;
+    }
   ) {
     // Take screenshot of the given url
     try {
@@ -26,7 +30,7 @@ class WebshotApi {
     return res; // this is blob data
   }
 
-  async processCSV(csvFile: { file: File }) {
+  async processCSV(csvFile: { file: File }, OPTIONS?: { bucket?: string }) {
     const file = csvFile.file;
 
     // Create a Promise that resolves when the file is read
@@ -43,13 +47,44 @@ class WebshotApi {
 
       // Process all URLs concurrently using Promise.all
       const keys = await Promise.all(
-        urls.map((url) => this.takeScreenshot(url))
+        urls.map((url) => this.takeScreenshot(url, OPTIONS))
       );
 
       return keys;
     } catch (error) {
       console.error("Error processing CSV:", error);
       throw error; // Rethrow or handle as needed
+    }
+  }
+  async saveKeys(bucketKey: string, keys: string[]) {
+    // Save the keys to the given bucketKey
+    try {
+      const res = await fetch("/api/bucketList", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucketKey, opCode: "save", keys }),
+      });
+      const { bucketKeys } = await res.json();
+      return bucketKeys;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
+  async getKeys(bucketKey: string) {
+    // Get the keys from the given bucketKey
+    try {
+      const res = await fetch("/api/bucketList", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucketKey }),
+      });
+      const { bucketKeys } = await res.json();
+      return bucketKeys;
+    } catch (err) {
+      console.log(err);
+      return null;
     }
   }
 

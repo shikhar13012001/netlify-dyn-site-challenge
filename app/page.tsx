@@ -7,10 +7,12 @@ import { BulkUpload } from "@/components/dropzone";
 import { toast } from "sonner";
 import { AiOutlineDownload } from "react-icons/ai";
 import Image from "next/image";
+import { v4 as uuidv4 } from "uuid";
 export default function Home() {
   const [url, setUrl] = useState("");
   const [screenshotKey, setScreenshotKey] = useState<string>("");
   const [screenshotBulkKeys, setScreenshotBulkKeys] = useState<string[]>([]);
+  const [bucketKey, setBucketKey] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [error, setError] = useState("");
@@ -42,8 +44,10 @@ export default function Home() {
     try {
       toast("Evaluating screenshots...");
       const api = new WebshotApi();
-
-      const keys = await api.processCSV(data);
+      const bucketKeyGen = uuidv4();
+      setBucketKey(bucketKeyGen);
+      const keys = await api.processCSV(data, { bucket: bucketKeyGen });
+      await api.saveKeys(bucketKeyGen, keys);
       setScreenshotBulkKeys(keys);
       setIsBulkLoading(false);
     } catch (err) {
@@ -88,36 +92,60 @@ export default function Home() {
         isLoading={isBulkLoading}
         setLoading={setIsBulkLoading}
       />
-      {screenshotBulkKeys.length > 0 && <BulkScreenshotResult screenshotBulkKeys={screenshotBulkKeys} />}
-      {screenshotKey && <SingleScreenshotResult url={url} setScreenshotKey={setScreenshotKey} setIsLoading={setIsLoading} screenshotKey={screenshotKey} />}
+      {screenshotBulkKeys.length > 0 && (
+        <BulkScreenshotResult
+          screenshotBulkKeys={screenshotBulkKeys}
+          bucketKey={bucketKey}
+        />
+      )}
+      {screenshotKey && (
+        <SingleScreenshotResult
+          url={url}
+          setScreenshotKey={setScreenshotKey}
+          setIsLoading={setIsLoading}
+          screenshotKey={screenshotKey}
+        />
+      )}
     </div>
   );
 }
 
-
 interface SingleScreenshotResultProps {
-  url: string;
-  setScreenshotKey: React.Dispatch<React.SetStateAction<string>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  url?: string;
+  setScreenshotKey?: React.Dispatch<React.SetStateAction<string>>;
+  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
   screenshotKey: string;
 }
-const SingleScreenshotResult:FC<SingleScreenshotResultProps> = ({ url, setScreenshotKey, setIsLoading, screenshotKey }) => {
-  
+export const SingleScreenshotResult: FC<SingleScreenshotResultProps> = ({
+  url,
+  screenshotKey,
+}) => {
   return (
     <div className="w-full flex flex-col items-center mt-4">
-      <h1 className="text-2xl text-white w-full text-left my-2">Screenshot of <a href={url} target="_blank" className="text-sm font-light text-gray-400  hover:text-indigo-500">{url}</a></h1>
+      {url && (
+        <h1 className="text-2xl text-white w-full text-left my-2">
+          Screenshot of{" "}
+          <a
+            href={url}
+            target="_blank"
+            className="text-sm font-light text-gray-400  hover:text-indigo-500"
+          >
+            {url}
+          </a>
+        </h1>
+      )}
       <div className="w-full flex items-center justify-start">
-      <Button
-      className="hover:bg-slate-800 bg-slate-700 w-full text-white font-light mt-4 max-w-[200px] my-2"
-        onClick={() => {
-          const link = document.createElement('a');
-          link.href = `/api/screenshots/${screenshotKey}`;
-          link.download = 'screenshot.png';
-          link.click();
-        }} 
-      >
-        Download Screenshot <AiOutlineDownload size={24} className="ml-2"/>
-      </Button>
+        <Button
+          className="hover:bg-slate-800 bg-slate-700 w-full text-white font-light mt-4 max-w-[200px] my-2"
+          onClick={() => {
+            const link = document.createElement("a");
+            link.href = `/api/screenshots/${screenshotKey}`;
+            link.download = "screenshot.png";
+            link.click();
+          }}
+        >
+          Download Screenshot <AiOutlineDownload size={24} className="ml-2" />
+        </Button>
       </div>
       {/* @ts-ignore */}
       <img
@@ -125,22 +153,24 @@ const SingleScreenshotResult:FC<SingleScreenshotResultProps> = ({ url, setScreen
         alt="Screenshot"
         className="max-w-full"
       />
-      
     </div>
   );
+};
 
-}
-
-
-const BulkScreenshotResult:FC<{ screenshotBulkKeys: string[] }> = ({ screenshotBulkKeys }) => {
+export const BulkScreenshotResult: FC<{
+  screenshotBulkKeys: string[];
+  bucketKey: string;
+}> = ({ screenshotBulkKeys, bucketKey }) => {
   return (
     <div className="w-full flex flex-col items-center mt-4">
-      <h1 className="text-2xl text-white w-full text-left my-2">Bulk Screenshot Results</h1>
+      <h1 className="text-2xl text-white w-full text-left my-2">
+        Bulk Screenshot Results
+      </h1>
       <div className="w-full flex items-center justify-start gap-4">
         {screenshotBulkKeys.map((key) => (
           <div key={key} className="flex flex-col items-center justify-center">
             <Image
-              src={`/api/screenshots/${key}`}
+              src={`/api/screenshots/${key}?bucket=${bucketKey}`}
               alt="Screenshot"
               width={300}
               height={200}
@@ -149,16 +179,17 @@ const BulkScreenshotResult:FC<{ screenshotBulkKeys: string[] }> = ({ screenshotB
               className="hover:bg-slate-800 bg-slate-700 w-full text-white font-light mt-4"
               onClick={() => {
                 const link = document.createElement("a");
-                link.href = `/api/screenshots/${key}`;
+                link.href = `/api/screenshots/${key}?bucket=${bucketKey}`;
                 link.download = "screenshot.png";
                 link.click();
               }}
             >
-              Download Screenshot <AiOutlineDownload size={24} className="ml-2" />
+              Download Screenshot{" "}
+              <AiOutlineDownload size={24} className="ml-2" />
             </Button>
           </div>
         ))}
       </div>
     </div>
   );
-}
+};

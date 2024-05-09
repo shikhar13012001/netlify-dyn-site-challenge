@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 export async function POST(req: NextRequest, res: Response) {
   // Parse the request body
   const { url, options = {} } = await req.json();
-  const { width = 1920, height = 1080, fullPage = false } = options;
+  const { width = 1920, height = 1080, fullPage = false, bucket="screenshots" } = options;
 
   // Validate required environment variables
   const { NETLIFY_API_TOKEN, NETLIFY_SITE_ID } = process.env;
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, res: Response) {
     } else {
       browser = await puppeteer.launch({
         headless: true,
-        executablePath: `/opt/buildhome/.cache/puppeteer/chrome/linux-124.0.6367.91/chrome-linux64/chrome`,
+        executablePath: `/usr/bin/google-chrome-stable`,
         args: [
           `--disable-gpu`,
           `--disable-setuid-sandbox`,
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest, res: Response) {
 
     // Save the screenshot to Netlify blob storage
     const store = getStore({
-      name: "screenshots",
+      name: bucket,
       siteID: NETLIFY_SITE_ID,
       token: NETLIFY_API_TOKEN,
     });
