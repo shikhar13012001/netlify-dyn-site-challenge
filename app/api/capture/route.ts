@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, res: Response) {
     } else {
       browser = await puppeteer.launch({
         headless: true,
-        executablePath: `/opt/buildhome/.cache/puppeteer/chrome/linux-124.0.6367.91`,
+        executablePath: `/usr/bin/google-chrome`,
         args: [
           `--disable-gpu`,
           `--disable-setuid-sandbox`,
