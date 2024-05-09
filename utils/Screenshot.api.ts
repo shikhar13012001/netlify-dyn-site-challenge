@@ -43,7 +43,7 @@ class WebshotApi {
 
     try {
       const fileContent = await readFilePromise;
-      const urls = fileContent.split("\n");
+      const urls = fileContent.split("\n").filter((url) => url.trim() !== "");
 
       // Process all URLs concurrently using Promise.all
       const keys = await Promise.all(

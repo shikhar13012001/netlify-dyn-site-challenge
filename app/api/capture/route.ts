@@ -68,7 +68,7 @@ export async function POST(req: NextRequest, res: Response) {
     });
 
     // Return the key to the stored image
-    return NextResponse.json({ key }, { status: 200 });
+    return NextResponse.json({ key }, { status: 200, });
   } catch (error) {
     console.log("ENV:", process.env.NODE_ENV);
     console.error("Error capturing screenshot:", error);

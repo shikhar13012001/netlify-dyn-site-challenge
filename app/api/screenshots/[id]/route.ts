@@ -30,7 +30,8 @@ export async function GET(
       headers: {
         "Content-Type": metadata.type as string,
         "Content-Length": String(metadata.size), // Ensure size is a string
-        "Cache-Control": "max-age=86400", // Optional: Cache for 1 day
+        "Netlify-CDN-Cache-Control":
+          "public, s-maxage=31536000, stale-while-revalidate=59",
       },
     });
   } catch (error) {

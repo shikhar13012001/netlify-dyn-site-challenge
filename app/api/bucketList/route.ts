@@ -35,8 +35,16 @@ export async function POST(req: NextRequest, res: Response) {
     }
 
     // Return the bucket keys
-    return NextResponse.json({ bucketKeys }, { status: 200 });
-
+    return NextResponse.json(
+      { bucketKeys },
+      {
+        status: 200,
+        headers: {
+          "Netlify-CDN-Cache-Control":
+            "public, s-maxage=31536000, stale-while-revalidate=59",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("Error handling request:", error);
     return NextResponse.json(
