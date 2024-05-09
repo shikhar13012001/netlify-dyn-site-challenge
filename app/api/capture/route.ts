@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: NextRequest, res: Response) {
   // Parse the request body
-  const { url, options={} } = await req.json();
+  const { url, options = {} } = await req.json();
   const { width = 1920, height = 1080, fullPage = false } = options;
 
   // Validate required environment variables
@@ -22,7 +22,22 @@ export async function POST(req: NextRequest, res: Response) {
 
   try {
     // Launch the browser and create a new page
-    const browser = await puppeteer.launch();
+    let browser = null;
+    if (process.env.NODE_ENV !== "production") {
+      browser = await puppeteer.launch({
+        headless: true,
+      });
+    } else {
+      browser = await puppeteer.launch({
+        executablePath: `/usr/bin/chromium-browser`,
+        args: [
+          `--disable-gpu`,
+          `--disable-setuid-sandbox`,
+          `--no-sandbox`,
+          `--no-zygote`,
+        ],
+      });
+    }
     const page = await browser.newPage();
 
     // Set the viewport as specified by the user or use defaults
