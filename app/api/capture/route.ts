@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, res: Response) {
     } else {
       browser = await puppeteer.launch({
         headless: true,
-        executablePath: `/usr/bin/chromium-browser`,
+        executablePath: `/opt/buildhome/.cache/puppeteer/chrome/linux-124.0.6367.91`,
         args: [
           `--disable-gpu`,
           `--disable-setuid-sandbox`,
@@ -70,6 +70,7 @@ export async function POST(req: NextRequest, res: Response) {
     // Return the key to the stored image
     return NextResponse.json({ key }, { status: 200 });
   } catch (error) {
+    console.log("ENV:", process.env.NODE_ENV);
     console.error("Error capturing screenshot:", error);
     return NextResponse.json(
       { error: "Failed to capture screenshot" },
