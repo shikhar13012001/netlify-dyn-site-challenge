@@ -11,7 +11,7 @@ const writableStream = fs.createWriteStream(path.join(__dirname, "urls.csv"));
 
 const urls = [];
 
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 2; i++) {
   urls.push("https://shikhar.pro/");
 }
 

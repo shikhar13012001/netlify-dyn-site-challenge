@@ -1,15 +1,18 @@
 "use client";
 import WebshotApi from "@/utils/Screenshot.api";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, FC } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BulkUpload } from "@/components/dropzone";
 import { toast } from "sonner";
+import { AiOutlineDownload } from "react-icons/ai";
+import Image from "next/image";
 export default function Home() {
   const [url, setUrl] = useState("");
-  const [screenshotKey, setScreenshotKey] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [screenshotKey, setScreenshotKey] = useState<string>("");
+  const [screenshotBulkKeys, setScreenshotBulkKeys] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -41,7 +44,7 @@ export default function Home() {
       const api = new WebshotApi();
 
       const keys = await api.processCSV(data);
-      setScreenshotKey(keys[0]);
+      setScreenshotBulkKeys(keys);
       setIsBulkLoading(false);
     } catch (err) {
       console.error(err);
@@ -85,22 +88,77 @@ export default function Home() {
         isLoading={isBulkLoading}
         setLoading={setIsBulkLoading}
       />
-      {screenshotKey && (
-        <div className="mt-4">
-          <img
-            src={`/api/screenshots/${screenshotKey}`}
-            alt="Screenshot"
-            className="max-w-full"
-          />
-          <a
-            href={`/api/screenshots/${screenshotKey}`}
-            download
-            className="text-blue-500 hover:underline"
-          >
-            Download Screenshot
-          </a>
-        </div>
-      )}
+      {screenshotBulkKeys.length > 0 && <BulkScreenshotResult screenshotBulkKeys={screenshotBulkKeys} />}
+      {screenshotKey && <SingleScreenshotResult url={url} setScreenshotKey={setScreenshotKey} setIsLoading={setIsLoading} screenshotKey={screenshotKey} />}
+    </div>
+  );
+}
+
+
+interface SingleScreenshotResultProps {
+  url: string;
+  setScreenshotKey: React.Dispatch<React.SetStateAction<string>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  screenshotKey: string;
+}
+const SingleScreenshotResult:FC<SingleScreenshotResultProps> = ({ url, setScreenshotKey, setIsLoading, screenshotKey }) => {
+  
+  return (
+    <div className="w-full flex flex-col items-center mt-4">
+      <h1 className="text-2xl text-white w-full text-left my-2">Screenshot of <a href={url} target="_blank" className="text-sm font-light text-gray-400  hover:text-indigo-500">{url}</a></h1>
+      <div className="w-full flex items-center justify-start">
+      <Button
+      className="hover:bg-slate-800 bg-slate-700 w-full text-white font-light mt-4 max-w-[200px] my-2"
+        onClick={() => {
+          const link = document.createElement('a');
+          link.href = `/api/screenshots/${screenshotKey}`;
+          link.download = 'screenshot.png';
+          link.click();
+        }} 
+      >
+        Download Screenshot <AiOutlineDownload size={24} className="ml-2"/>
+      </Button>
+      </div>
+      {/* @ts-ignore */}
+      <img
+        src={`/api/screenshots/${screenshotKey}`}
+        alt="Screenshot"
+        className="max-w-full"
+      />
+      
+    </div>
+  );
+
+}
+
+
+const BulkScreenshotResult:FC<{ screenshotBulkKeys: string[] }> = ({ screenshotBulkKeys }) => {
+  return (
+    <div className="w-full flex flex-col items-center mt-4">
+      <h1 className="text-2xl text-white w-full text-left my-2">Bulk Screenshot Results</h1>
+      <div className="w-full flex items-center justify-start gap-4">
+        {screenshotBulkKeys.map((key) => (
+          <div key={key} className="flex flex-col items-center justify-center">
+            <Image
+              src={`/api/screenshots/${key}`}
+              alt="Screenshot"
+              width={300}
+              height={200}
+            />
+            <Button
+              className="hover:bg-slate-800 bg-slate-700 w-full text-white font-light mt-4"
+              onClick={() => {
+                const link = document.createElement("a");
+                link.href = `/api/screenshots/${key}`;
+                link.download = "screenshot.png";
+                link.click();
+              }}
+            >
+              Download Screenshot <AiOutlineDownload size={24} className="ml-2" />
+            </Button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
