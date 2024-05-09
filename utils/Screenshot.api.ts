@@ -7,13 +7,18 @@ class WebshotApi {
     OPTIONS?: { width?: number; height?: number; fullPage?: boolean }
   ) {
     // Take screenshot of the given url
-    const res = await fetch("/api/capture", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url, OPTIONS }),
-    });
-    const { key } = await res.json();
-    return key;
+    try {
+      const res = await fetch("/api/capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, OPTIONS }),
+      });
+      const { key } = await res.json();
+      return key;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
   async getScreenshot(key: string) {
     // Get the screenshot from the given key
@@ -26,25 +31,27 @@ class WebshotApi {
 
     // Create a Promise that resolves when the file is read
     const readFilePromise = new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-        reader.readAsText(file);
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+      reader.readAsText(file);
     });
 
     try {
-        const fileContent = await readFilePromise;
-        const urls = fileContent.split("\n");
+      const fileContent = await readFilePromise;
+      const urls = fileContent.split("\n");
 
-        // Process all URLs concurrently using Promise.all
-        const keys = await Promise.all(urls.map(url => this.takeScreenshot(url)));
+      // Process all URLs concurrently using Promise.all
+      const keys = await Promise.all(
+        urls.map((url) => this.takeScreenshot(url))
+      );
 
-        return keys;
+      return keys;
     } catch (error) {
-        console.error("Error processing CSV:", error);
-        throw error;  // Rethrow or handle as needed
+      console.error("Error processing CSV:", error);
+      throw error; // Rethrow or handle as needed
     }
-}
+  }
 
   async downloadScreenshot(key: string) {
     // download the screenshot from the given key
