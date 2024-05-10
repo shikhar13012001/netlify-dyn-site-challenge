@@ -1,7 +1,6 @@
 "use client";
-import React from "react";
+import { SingleScreenshotResult } from "@/components/single-screenshot-result";
 import { useParams } from "next/navigation";
-import { SingleScreenshotResult } from "@/app/page";
 const SingleScreenshotImagePage = () => {
   const { id } = useParams();
   return (

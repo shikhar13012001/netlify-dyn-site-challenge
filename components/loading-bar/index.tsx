@@ -1,17 +1,20 @@
 "use client";
 
-import { FcMultipleCameras } from "react-icons/fc";
-import { CgWebsite } from "react-icons/cg";
-import { cn } from "@/lib/utils";
 import { AnimatedBeam } from "@/components/magicui/animated-beam";
+import { cn } from "@/lib/utils";
 import React, { forwardRef, useRef } from "react";
+import { CgWebsite } from "react-icons/cg";
+import { FcMultipleCameras } from "react-icons/fc";
 
 interface CircleProps {
   className: string;
   children: React.ReactNode;
 }
 
-const CircleComponent = ({ className, children,...props }:CircleProps, ref: React.ForwardedRef<HTMLDivElement>)=> {
+const CircleComponent = (
+  { className, children, ...props }: CircleProps,
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
   return (
     <div
       ref={ref}
@@ -26,7 +29,7 @@ const CircleComponent = ({ className, children,...props }:CircleProps, ref: Reac
 };
 
 const Circle = forwardRef<HTMLDivElement, CircleProps>(CircleComponent);
-const  LoadingBar = () => {
+const LoadingBar = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const div1Ref = useRef<HTMLDivElement>(null);
   const div2Ref = useRef<HTMLDivElement>(null);
@@ -66,7 +69,6 @@ const  LoadingBar = () => {
       />
     </div>
   );
-}
+};
 
-
-export default LoadingBar
+export default LoadingBar;

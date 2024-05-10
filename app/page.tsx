@@ -1,13 +1,12 @@
 "use client";
-import WebshotApi from "@/utils/Screenshot.api";
-import { FormEvent, useState, FC } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { BulkScreenshotResult } from "@/components/bulk-screenshot-result";
 import { BulkUpload } from "@/components/dropzone";
+import { SingleScreenshotResult } from "@/components/single-screenshot-result";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import WebshotApi from "@/utils/Screenshot.api";
+import { FormEvent, useState } from "react";
 import { toast } from "sonner";
-import { AiOutlineDownload } from "react-icons/ai";
-import Image from "next/image";
-import { IoCopyOutline } from "react-icons/io5";
 import { v4 as uuidv4 } from "uuid";
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -110,133 +109,3 @@ export default function Home() {
     </div>
   );
 }
-
-interface SingleScreenshotResultProps {
-  url?: string;
-  setScreenshotKey?: React.Dispatch<React.SetStateAction<string>>;
-  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
-  screenshotKey: string;
-}
-export const SingleScreenshotResult: FC<SingleScreenshotResultProps> = ({
-  url,
-  screenshotKey,
-}) => {
-  const handleCopy = () => {
-    // copy the persistent link to the clipboard
-    navigator.clipboard
-      .writeText(`http://localhost:3000/api/screenshot/image/${screenshotKey}`)
-      .then(() => {
-        toast("Link copied to clipboard");
-      })
-      .catch((err) => {
-        console.error(err);
-        toast("Failed to copy link to clipboard");
-      });
-  };
-
-  return (
-    <div className="w-full flex flex-col items-center mt-4">
-      {url && (
-        <h1 className="text-2xl text-white w-full text-left my-2">
-          Screenshot of{" "}
-          <a
-            href={url}
-            target="_blank"
-            className="text-sm font-light text-gray-400  hover:text-indigo-500"
-          >
-            {url}
-          </a>
-        </h1>
-      )}
-      <div className="w-full flex items-center justify-start gap-4">
-        <Button
-          className="hover:bg-slate-800 bg-slate-700 w-full text-white font-light mt-4 max-w-[200px] my-2"
-          onClick={() => {
-            const link = document.createElement("a");
-            link.href = `/api/screenshots/${screenshotKey}`;
-            link.download = "screenshot.png";
-            link.click();
-          }}
-        >
-          Download Screenshot <AiOutlineDownload size={24} className="ml-2" />
-        </Button>
-
-        {/* Copy persistent link button */}
-        <Button
-          variant="outline"
-          onClick={handleCopy}
-          className="hover:bg-slate-800 border-slate-400  w-full text-white font-light mt-4 max-w-[200px] my-2"
-        >
-          Copy Persistent Link
-          <IoCopyOutline size={24} className="ml-2" />
-        </Button>
-      </div>
-      {/* @ts-ignore */}
-      <img
-        src={`/api/screenshots/${screenshotKey}`}
-        alt="Screenshot"
-        className="max-w-full"
-      />
-    </div>
-  );
-};
-
-export const BulkScreenshotResult: FC<{
-  screenshotBulkKeys: string[];
-  bucketKey: string;
-}> = ({ screenshotBulkKeys, bucketKey }) => {
-  const handleCopy = () => {
-    // copy the persistent link to the clipboard
-    navigator.clipboard
-      .writeText(`http://localhost:3000/screenshot/bucket/${bucketKey}`)
-      .then(() => {
-        toast("Link copied to clipboard");
-      })
-      .catch((err) => {
-        console.error(err);
-        toast("Failed to copy link to clipboard");
-      });
-  };
-  return (
-    <div className="w-full flex flex-col items-center mt-4">
-      <h1 className="text-2xl text-white w-full text-left my-2">
-        Bulk Screenshot Results
-      </h1>
-      <div className="w-full flex items-center justify-start gap-4">
-        <Button
-          variant={"outline"}
-          onClick={handleCopy}
-          className="hover:bg-slate-800 border-slate-400  w-full text-white font-light mt-4 max-w-[200px] my-2"
-        >
-          Copy Persistent Link
-          <IoCopyOutline size={24} className="ml-2" />
-        </Button>
-      </div>
-      <div className="w-full flex items-center justify-start gap-4">
-        {screenshotBulkKeys.map((key) => (
-          <div key={key} className="flex flex-col items-center justify-center">
-            <Image
-              src={`/api/screenshots/${key}?bucket=${bucketKey}`}
-              alt="Screenshot"
-              width={300}
-              height={200}
-            />
-            <Button
-              className="hover:bg-slate-800 bg-slate-700 w-full text-white font-light mt-4"
-              onClick={() => {
-                const link = document.createElement("a");
-                link.href = `/api/screenshots/${key}?bucket=${bucketKey}`;
-                link.download = "screenshot.png";
-                link.click();
-              }}
-            >
-              Download Screenshot{" "}
-              <AiOutlineDownload size={24} className="ml-2" />
-            </Button>
-            {/* Copy persistent link button */}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};

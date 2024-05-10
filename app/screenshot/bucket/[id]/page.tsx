@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { BulkScreenshotResult } from "@/app/page";
+import { BulkScreenshotResult } from "@/components/bulk-screenshot-result";
 import WebshotApi from "@/utils/Screenshot.api";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const getBucketKeys = async (bucketKey: string) => {
   try {
