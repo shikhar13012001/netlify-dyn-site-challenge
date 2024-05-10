@@ -17,7 +17,7 @@ export const SingleScreenshotResult: FC<SingleScreenshotResultProps> = ({
   const handleCopy = () => {
     // copy the persistent link to the clipboard
     navigator.clipboard
-      .writeText(`http://localhost:3000/api/screenshot/image/${screenshotKey}`)
+      .writeText(`http://localhost:3000/screenshot/image/${screenshotKey}`)
       .then(() => {
         toast("Link copied to clipboard");
       })
