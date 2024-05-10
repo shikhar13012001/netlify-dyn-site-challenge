@@ -5,7 +5,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const { id } = params; // Extract the screenshot ID from the request parameters
-  const bucket = (req.nextUrl.searchParams.get("bucket") || "screenshots") as string;
+  const bucket = "screenshots"
   const store = getStore({
     siteID: process.env.NETLIFY_SITE_ID,
     token: process.env.NETLIFY_API_TOKEN,
