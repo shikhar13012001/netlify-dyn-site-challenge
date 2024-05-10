@@ -35,7 +35,9 @@ export async function POST(req: NextRequest, res: Response) {
       browser = await puppeteerCore.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: process.env.CHROME_EXECUTABLE_PATH ?? (await chromium.executablePath('/var/task/node_modules/@sparticuz/chromium/bin')),
+        executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
       })
     }
     const page = await browser.newPage();
