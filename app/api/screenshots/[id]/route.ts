@@ -1,11 +1,11 @@
 import { getStore } from "@netlify/blobs";
-import { NextApiRequest } from "next";
+import { NextRequest } from "next/server";
 export async function GET(
-  req: NextApiRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id } = params; // Extract the screenshot ID from the request parameters
-  const bucket = (req.query?.bucket as string) || "screenshots";
+  const bucket = (req.nextUrl.searchParams.get("bucket") || "screenshots") as string;
   const store = getStore({
     siteID: process.env.NETLIFY_SITE_ID,
     token: process.env.NETLIFY_API_TOKEN,
