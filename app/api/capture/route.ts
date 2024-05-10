@@ -2,7 +2,11 @@ import { getStore } from "@netlify/blobs";
 import puppeteer from "puppeteer";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
+import chromium from '@sparticuz/chromium';
+import puppeteerCore from 'puppeteer-core';
 
+chromium.setHeadlessMode = true
+chromium.setGraphicsMode = false
 export async function POST(req: NextRequest, res: Response) {
   // Parse the request body
   const { url, options = {} } = await req.json();
@@ -28,11 +32,11 @@ export async function POST(req: NextRequest, res: Response) {
         headless: true,
       });
     } else {
-      browser = await puppeteer.launch({
-        headless: true,
-        executablePath: `/usr/bin/google-chrome`,
-        args: [`--no-sandbox`, `--headless`, `--disable-gpu`, `--disable-dev-shm-usage`],
-      });
+      browser = await puppeteerCore.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: process.env.CHROME_EXECUTABLE_PATH ?? (await chromium.executablePath('/var/task/node_modules/@sparticuz/chromium/bin')),
+      })
     }
     const page = await browser.newPage();
 
