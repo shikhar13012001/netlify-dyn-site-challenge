@@ -28,7 +28,7 @@ export async function GET(
     // Return the blob data with the appropriate content type and content length headers
     return new Response(data, {
       headers: {
-        "Content-Type": metadata.type as string,
+        "Content-Type": 'image/png',
         "Content-Length": String(metadata.size), // Ensure size is a string
         "Netlify-CDN-Cache-Control":
           "public, s-maxage=31536000, stale-while-revalidate=59",

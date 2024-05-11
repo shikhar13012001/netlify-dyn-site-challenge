@@ -48,6 +48,7 @@ export default function Home() {
       setBucketKey(bucketKeyGen);
       const keys = await api.processCSV(data, { bucket: bucketKeyGen });
       await api.saveKeys(bucketKeyGen, keys);
+      console.log(keys)
       setScreenshotBulkKeys(keys);
       setIsBulkLoading(false);
     } catch (err) {
@@ -59,8 +60,8 @@ export default function Home() {
 
   return (
     <div className="w-full min-h-[100vh] flex flex-col items-center p-8">
-      <h1 className="text-8xl font-regular tracking-tight">WebVoyager</h1>
-      <p className="leading-7 [&:not(:first-child)]:mt-6 w-1/2 text-center grayColor">
+      <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-8xl font-regular tracking-tight">WebVoyager</h1>
+      <p className="leading-7 [&:not(:first-child)]:mt-6 w-full md:w-2/3 lg:w-1/2 text-center grayColor">
         Capture a screenshot of any website by entering the URL below. The
         screenshot will be saved to{" "}
         <i className="font-bold">Netlify blob storage</i>. Netlify Blobs
@@ -73,7 +74,7 @@ export default function Home() {
           placeholder="https://www.example.com"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          className="w-[400px] mt-8 bg-gray-500 outline-none input-border"
+          className="max-w-[400px] mt-8 bg-gray-500 outline-none input-border"
           size={48}
         />
 

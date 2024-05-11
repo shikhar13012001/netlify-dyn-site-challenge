@@ -49,7 +49,7 @@ class WebshotApi {
       const keys = await Promise.all(
         urls.map((url) => this.takeScreenshot(url, OPTIONS))
       );
-
+       console.log(keys)
       return keys;
     } catch (error) {
       console.error("Error processing CSV:", error);

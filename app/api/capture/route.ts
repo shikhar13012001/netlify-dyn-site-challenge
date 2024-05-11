@@ -1,16 +1,14 @@
-import { getStore } from "@netlify/blobs";
-import puppeteer from "puppeteer";
 import { NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
-import chromium from '@sparticuz/chromium';
-import puppeteerCore from 'puppeteer-core';
 
-chromium.setHeadlessMode = true
-chromium.setGraphicsMode = false
 export async function POST(req: NextRequest, res: Response) {
   // Parse the request body
   const { url, options = {} } = await req.json();
-  const { width = 1920, height = 1080, fullPage = false, bucket="screenshots" } = options;
+  if (!url) {
+    return NextResponse.json(
+      { error: "Missing required parameter: url" },
+      { status: 400 }
+    );
+  }
 
   // Validate required environment variables
   const { NETLIFY_API_TOKEN, NETLIFY_SITE_ID } = process.env;
@@ -26,46 +24,20 @@ export async function POST(req: NextRequest, res: Response) {
 
   try {
     // Launch the browser and create a new page
-    let browser = null;
-    if (process.env.NODE_ENV !== "production") {
-      browser = await puppeteer.launch({
-        headless: true,
-      });
-    } else {
-      browser = await puppeteer.launch({
-        headless: true,
-      });
-    }
-    const page = await browser.newPage();
 
-    // Set the viewport as specified by the user or use defaults
-    await page.setViewport({ width, height });
-
-    // Navigate to the URL and take a screenshot
-    await page.goto(url, { waitUntil: "networkidle2" });
-    const screenshotBuffer = await page.screenshot({ fullPage });
-
-    // Close the browser
-    await browser.close();
-
-    // Save the screenshot to Netlify blob storage
-    const store = getStore({
-      name: bucket,
-      siteID: NETLIFY_SITE_ID,
-      token: NETLIFY_API_TOKEN,
-    });
-
-    const key = uuidv4();
-    await store.set(key, screenshotBuffer, {
-      metadata: {
-        url,
-        type: "image/png",
-        size: { width, height },
-      },
-    });
-
+    const _key = await fetch(
+      "https://netlify-dyn-site-challenge-server-api.onrender.com/scrape",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
+      }
+    );
+    const {key} = await _key.json();
     // Return the key to the stored image
-    return NextResponse.json({ key }, { status: 200, });
+    return NextResponse.json({ key }, { status: 200 });
   } catch (error) {
     console.log("ENV:", process.env.NODE_ENV);
     console.error("Error capturing screenshot:", error);
