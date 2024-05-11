@@ -13,7 +13,7 @@ const store = getStore({
 
 const scrapeLogic = async (req, res) => {
   const browserOptions = {
-    headless: false,
+    headless: true,
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
