@@ -13,6 +13,7 @@ const store = getStore({
 
 const scrapeLogic = async (req, res) => {
   const browserOptions = {
+    headless: false,
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
@@ -38,12 +39,11 @@ const scrapeLogic = async (req, res) => {
     const browser = await puppeteer.launch({...browserOptions});
 
     const page = await browser.newPage();
+    await page.setDefaultNavigationTimeout(0); 
 
     await page.setViewport({ width, height });
     await page.goto(url, { waitUntil: "networkidle2" });
      // disable all timeouts
-    page.setDefaultNavigationTimeout(0);
-    page.setDefaultTimeout(0);
 
     const screenshot = await page.screenshot({ fullPage });
     await browser.close();
