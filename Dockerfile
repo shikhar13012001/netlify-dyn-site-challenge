@@ -8,5 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-CMD [ "node", "index.js" ]
+# restart the server if any error occurs
+CMD ["node", "index.js"]
+
 
