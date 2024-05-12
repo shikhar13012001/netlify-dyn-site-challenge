@@ -1,0 +1,1 @@
+export const SERVER_API_URL = "https://netlify-dyn-site-challenge-server-api.onrender.com";

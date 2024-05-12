@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
+import { SERVER_API_URL } from "@/lib/constants";
 export async function POST(req: NextRequest, res: Response) {
   // Parse the request body
   const { url, options = {} } = await req.json();
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, res: Response) {
     // Launch the browser and create a new page
 
     const _key = await fetch(
-      "https://netlify-dyn-site-challenge-server-api.onrender.com/scrape",
+      `${SERVER_API_URL}/scrape`,
       {
         method: "POST",
         headers: {
